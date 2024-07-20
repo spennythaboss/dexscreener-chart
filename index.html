@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Chart</title>
+    <style>
+        body {
+            font-family: system-ui;
+            background: #f06d06;
+            color: white;
+            text-align: center;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="400" height="200"></canvas>
+    <script>
+        fetch('https://api.dexscreener.com/latest/dex/tokens/Hbrr2uEuijw2fu2pAjBCHn3iNrAh1xUhttDerKDyEe1b')
+            .then(response => response.json())
+            .then(data => {
+                // Assume the API provides a list of prices with timestamps
+                const chartData = data.pairs[0].prices.map(priceEntry => ({
+                    time: priceEntry.timestamp,
+                    price: priceEntry.priceUsd
+                }));
+
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.map(entry => new Date(entry.time).toLocaleString()),
+                        datasets: [{
+                            label: 'Price (USD)',
+                            data: chartData.map(entry => entry.price),
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
